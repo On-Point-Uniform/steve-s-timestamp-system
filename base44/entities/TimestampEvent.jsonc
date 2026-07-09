@@ -1,0 +1,60 @@
+{
+  "name": "TimestampEvent",
+  "type": "object",
+  "properties": {
+    "session_number": {
+      "type": "number",
+      "title": "Session Number",
+      "description": "The session this event belongs to"
+    },
+    "event_name": {
+      "type": "string",
+      "title": "Event Name",
+      "enum": [
+        "Stamp In",
+        "Break Start",
+        "Break End",
+        "Stamp Out"
+      ],
+      "default": "Stamp In"
+    },
+    "break_number": {
+      "type": "number",
+      "title": "Break Number",
+      "description": "Break number, when applicable",
+      "default": null
+    },
+    "full_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Full Timestamp"
+    },
+    "status_after": {
+      "type": "string",
+      "title": "Status After Event",
+      "description": "The status after this event was recorded"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "title": "Date"
+    },
+    "time": {
+      "type": "string",
+      "title": "Time"
+    },
+    "log_sequence": {
+      "type": "number",
+      "title": "Log ID",
+      "description": "Sequential ID for the audit log"
+    }
+  },
+  "required": [
+    "session_number",
+    "event_name",
+    "full_timestamp",
+    "status_after",
+    "date",
+    "time"
+  ]
+}
