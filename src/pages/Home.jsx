@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Clock, LogIn, LogOut, Coffee, Play } from 'lucide-react';
+import { Clock, LogIn, LogOut, Coffee, Play, User } from 'lucide-react';
 
 const DOUBLE_TAP_WINDOW = 350;
 
 export default function Home() {
+  const [identity, setIdentity] = useState(null);
   const [phase, setPhase] = useState('loading');
   const [sessionNumber, setSessionNumber] = useState(1);
   const [breakCount, setBreakCount] = useState(0);
@@ -29,6 +30,21 @@ export default function Home() {
   useEffect(() => { phaseRef.current = phase; }, [phase]);
   useEffect(() => { sessionRef.current = sessionNumber; }, [sessionNumber]);
   useEffect(() => { breakRef.current = breakCount; }, [breakCount]);
+
+  // Portal auth guard
+  useEffect(() => {
+    const stored = sessionStorage.getItem('portal_identity');
+    if (!stored) {
+      window.location.href = '/login';
+      return;
+    }
+    setIdentity(JSON.parse(stored));
+  }, []);
+
+  const handleSignOut = () => {
+    sessionStorage.removeItem('portal_identity');
+    window.location.href = '/login';
+  };
 
   // Load state from DB
   useEffect(() => {
@@ -208,7 +224,21 @@ export default function Home() {
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col items-center px-4 py-8 sm:py-12">
       {/* Header */}
-      <div className="text-center mb-6">
+      <div className="text-center mb-6 w-full max-w-2xl">
+        <div className="flex items-center justify-between mb-2">
+          {identity && (
+            <div className="flex items-center gap-2 text-sm text-slate-600">
+              <User className="w-4 h-4" />
+              <span className="font-medium">{identity.employee_name}</span>
+            </div>
+          )}
+          <button
+            onClick={handleSignOut}
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:bg-slate-100 border border-slate-200 transition-colors"
+          >
+            <LogOut className="w-3.5 h-3.5" /> Sign Out
+          </button>
+        </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">
           Steve's Timestamp System
         </h1>

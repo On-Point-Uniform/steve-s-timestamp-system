@@ -10,6 +10,8 @@ import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Database from './pages/Database';
 import Layout from './components/Layout';
+import StaffLogin from './pages/StaffLogin';
+import PortalCallback from './pages/PortalCallback';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -38,6 +40,8 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       {/* Add your page Route elements here */}
+      <Route path="/login" element={<StaffLogin />} />
+      <Route path="/callback" element={<PortalCallback />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/database" element={<Database />} />
