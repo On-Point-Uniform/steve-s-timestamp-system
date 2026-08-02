@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { base44 } from '@/api/base44Client';
+import { listAllEvents } from '@/api/timestampEvents';
 import {
   FileSpreadsheet, FileText, Printer, Filter, X, ArrowUpDown, Loader2, Calendar
 } from 'lucide-react';
@@ -21,7 +21,7 @@ export default function Database() {
     setLoading(true);
     setError(null);
     try {
-      const data = await base44.entities.TimestampEvent.list('-created_date', 5000);
+      const data = await listAllEvents(5000);
       setRecords(data || []);
     } catch (e) {
       console.error(e);

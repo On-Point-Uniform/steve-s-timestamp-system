@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { portalBase44 } from '@/lib/portalClient';
+import { findValidToken, consumeToken, saveIdentity } from '@/api/portalAuth';
 import { Clock, AlertCircle } from 'lucide-react';
 
 export default function PortalCallback() {
@@ -17,28 +17,24 @@ export default function PortalCallback() {
 
     const verify = async () => {
       try {
-        const results = await portalBase44.entities.ExternalAuthToken.filter({ token, used: false });
-        if (!results || results.length === 0) {
+        const record = await findValidToken(token);
+        if (!record) {
           setError('Invalid or already-used token. Please sign in again.');
           return;
         }
 
-        const record = results[0];
-        const now = new Date();
-        const expiresAt = new Date(record.expires_at);
-        if (now > expiresAt) {
+        if (new Date() > new Date(record.expires_at)) {
           setError('Your sign-in link has expired. Please try again.');
           return;
         }
 
-        await portalBase44.entities.ExternalAuthToken.update(record.id, { used: true });
+        await consumeToken(record.id);
 
-        const identity = {
+        saveIdentity({
           employee_name: employeeName || record.employee_name || 'Staff Member',
           role: record.role || 'staff',
           employee_id: record.employee_id || record.id,
-        };
-        sessionStorage.setItem('portal_identity', JSON.stringify(identity));
+        });
         window.location.href = '/';
       } catch (e) {
         console.error(e);

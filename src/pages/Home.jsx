@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { base44 } from '@/api/base44Client';
+import { listRecentEvents, createEvent as apiCreateEvent } from '@/api/timestampEvents';
+import { getIdentity, clearIdentity } from '@/api/portalAuth';
 import { Clock, LogIn, LogOut, Coffee, Play, User } from 'lucide-react';
 
 const DOUBLE_TAP_WINDOW = 350;
@@ -33,16 +34,16 @@ export default function Home() {
 
   // Portal auth guard
   useEffect(() => {
-    const stored = sessionStorage.getItem('portal_identity');
-    if (!stored) {
+    const id = getIdentity();
+    if (!id) {
       window.location.href = '/login';
       return;
     }
-    setIdentity(JSON.parse(stored));
+    setIdentity(id);
   }, []);
 
   const handleSignOut = () => {
-    sessionStorage.removeItem('portal_identity');
+    clearIdentity();
     window.location.href = '/login';
   };
 
@@ -50,7 +51,7 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       try {
-        const events = await base44.entities.TimestampEvent.list('-created_date', 200);
+        const events = await listRecentEvents(200);
         if (events.length === 0) {
           phaseRef.current = 'idle';
           setPhase('idle');
@@ -113,7 +114,7 @@ export default function Home() {
     };
     logIdRef.current += 1;
     try {
-      await base44.entities.TimestampEvent.create(record);
+      await apiCreateEvent(record);
       setLastEvent(formatEventLabel({ event_name: eventName, break_number: breakNumber }));
       setLastDateTime(now);
     } catch (e) {
